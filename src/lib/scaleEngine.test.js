@@ -9,8 +9,42 @@ import {
   formatDollars,
   formatShort,
   secondsToComplete,
+  secondsToReach,
+  BRISK_PX_PER_SECOND,
   formatDuration
 } from './scaleEngine.js';
+
+describe('BRISK_PX_PER_SECOND', () => {
+  it('stands in for a determined reader', () => {
+    expect(BRISK_PX_PER_SECOND).toBe(3000);
+  });
+});
+
+describe('secondsToReach', () => {
+  it('reaches a million in about three seconds', () => {
+    expect(secondsToReach(positionOf(1e6), BRISK_PX_PER_SECOND)).toBeCloseTo(3.33, 1);
+  });
+
+  it('reaches a billion in under an hour', () => {
+    const seconds = secondsToReach(positionOf(1e9), BRISK_PX_PER_SECOND);
+    expect(seconds).toBeGreaterThan(3000);
+    expect(seconds).toBeLessThan(3600);
+  });
+
+  it('takes about thirty-nine days to reach a trillion', () => {
+    const days = secondsToReach(positionOf(TRILLION), BRISK_PX_PER_SECOND) / 86_400;
+    expect(days).toBeGreaterThan(38);
+    expect(days).toBeLessThan(40);
+  });
+
+  it('starts at zero', () => {
+    expect(secondsToReach(0, BRISK_PX_PER_SECOND)).toBe(0);
+  });
+
+  it('never arrives when stopped', () => {
+    expect(secondsToReach(positionOf(1e6), 0)).toBe(Infinity);
+  });
+});
 
 describe('constants', () => {
   it('scales at one hundred dollars per pixel', () => {

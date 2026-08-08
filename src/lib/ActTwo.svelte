@@ -10,10 +10,23 @@
     formatDollars,
     formatShort,
     secondsToComplete,
+    secondsToReach,
+    BRISK_PX_PER_SECOND,
     formatDuration
   } from './scaleEngine.js';
 
   const MAX = positionOf(TRILLION);
+
+  /** The three amounts the piece is about, as distances and as durations. */
+  const HEADLINES = [1e6, 1e9, TRILLION].map((dollars) => ({
+    dollars,
+    label: formatShort(dollars),
+    amount: formatDollars(dollars),
+    pixels: positionOf(dollars),
+    duration: formatDuration(secondsToReach(positionOf(dollars), BRISK_PX_PER_SECOND))
+  }));
+
+  const PIXELS = new Intl.NumberFormat('en-US');
 
   /** Past this, the readout has earned the line about not finishing. */
   const A_DAY = 86_400;
@@ -105,6 +118,23 @@
   function jumpTo(target) {
     position = target;
   }
+
+  /**
+   * A hijacked, momentum-driven, effectively endless scroll is the precise
+   * thing this query exists to protect people from. The static path is not a
+   * degraded fallback — it makes the same argument in prose and a table.
+   */
+  let reducedMotion = $state(false);
+
+  $effect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = query.matches;
+
+    const onChange = (event) => (reducedMotion = event.matches);
+    query.addEventListener('change', onChange);
+
+    return () => query.removeEventListener('change', onChange);
+  });
 </script>
 
 <section class="act" aria-labelledby="act-two-heading">
@@ -116,6 +146,69 @@
     </p>
   </header>
 
+  {#if reducedMotion}
+    <div class="static">
+      <p>
+        The ribbon below is normally scrolled. At a determined {PIXELS.format(
+          BRISK_PX_PER_SECOND
+        )} pixels per second, here is what each amount costs to reach.
+      </p>
+
+      <table>
+        <caption class="sr-only">Distance and time to reach each amount at $100 per pixel</caption>
+        <thead>
+          <tr>
+            <th scope="col">Amount</th>
+            <th scope="col">Distance</th>
+            <th scope="col">Time to reach</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each HEADLINES as headline (headline.dollars)}
+            <tr>
+              <th scope="row">{headline.amount}</th>
+              <td>{PIXELS.format(headline.pixels)} px</td>
+              <td>{headline.duration}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+
+      <p class="futility">You are not expected to finish this.</p>
+
+      <p>
+        Every recognisable sum sits inside the first {PIXELS.format(
+          ladder[ladder.length - 1].position
+        )} pixels — {formatFraction(ladder[ladder.length - 1].position / MAX)} of the distance.
+      </p>
+
+      <table>
+        <caption class="sr-only">The ladder of recognisable sums</caption>
+        <thead>
+          <tr>
+            <th scope="col">Sum</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each ladder as referent (referent.dollars)}
+            <tr>
+              <th scope="row">
+                {referent.label}
+                <span class="row-note">{referent.note}</span>
+              </th>
+              <td>{formatDollars(referent.dollars)}</td>
+              <td>
+                <a href={referent.source} rel="noreferrer">Source</a>
+                <span class="as-of">as of {referent.asOf}</span>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {:else}
   <div class="stage" bind:clientHeight={height}>
     <VirtualScroll bind:position bind:speed {height}>
       <Ribbon {position} {height} />
@@ -150,29 +243,34 @@
     {/if}
   </div>
 
-  <div class="controls">
-    <p class="controls-label" id="jump-label">Jump ahead</p>
-    <ul class="jumps" aria-labelledby="jump-label">
-      {#each JUMPS as jump (jump.dollars)}
+    <div class="controls">
+      <p class="controls-label" id="jump-label">Jump ahead</p>
+      <ul class="jumps" aria-labelledby="jump-label">
+        {#each JUMPS as jump (jump.dollars)}
+          <li>
+            <button type="button" onclick={() => jumpTo(jump.position)}>{jump.label}</button>
+          </li>
+        {/each}
+      </ul>
+    </div>
+
+    <p class="sr-only" role="status" aria-live="polite">{announcement}</p>
+
+    <!-- The canvas is decoration. This is the content. The static path carries
+         the same figures in its tables, so it does not repeat them here. -->
+    <ol class="sr-only">
+      {#each ladder as referent (referent.dollars)}
         <li>
-          <button type="button" onclick={() => jumpTo(jump.position)}>{jump.label}</button>
+          {referent.label}: {formatDollars(referent.dollars)}. {referent.note}
+          <a href={referent.source} rel="noreferrer">Source, as of {referent.asOf}</a>
         </li>
       {/each}
-    </ul>
+    </ol>
+  {/if}
+
+  <p class="onward">
     <a class="skip" href="#act-three">Skip to Act III</a>
-  </div>
-
-  <p class="sr-only" role="status" aria-live="polite">{announcement}</p>
-
-  <!-- The canvas is decoration. This is the content. -->
-  <ol class="sr-only">
-    {#each ladder as referent (referent.dollars)}
-      <li>
-        {referent.label}: {formatDollars(referent.dollars)}. {referent.note}
-        <a href={referent.source} rel="noreferrer">Source, as of {referent.asOf}</a>
-      </li>
-    {/each}
-  </ol>
+  </p>
 </section>
 
 <style>
@@ -277,12 +375,74 @@
     color: var(--text-secondary);
   }
 
+  .static p {
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem;
+  }
+
+  .static .futility {
+    color: var(--guess);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 2rem;
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  tbody th {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  tbody td {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+  }
+
+  .row-note {
+    display: block;
+    margin-top: 0.2rem;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+  }
+
+  .as-of {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
   .controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
     margin-top: 1.25rem;
+  }
+
+  .onward {
+    margin: 1.25rem 0 0;
   }
 
   .controls-label {
@@ -321,7 +481,6 @@
   }
 
   .skip {
-    margin-left: auto;
     font-size: 0.8125rem;
     color: var(--truth);
   }

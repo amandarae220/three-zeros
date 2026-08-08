@@ -60,6 +60,19 @@ const UNITS = [
   { seconds: 1, name: 'second' }
 ];
 
+/**
+ * A determined reader's sustained scroll. Used where a figure has to be quoted
+ * without a live speed to quote — the static, reduced-motion path.
+ */
+export const BRISK_PX_PER_SECOND = 3000;
+
+/** How long it takes to arrive at `position` from the start. */
+export function secondsToReach(position, pxPerSecond) {
+  if (position <= 0) return 0;
+  if (pxPerSecond <= 0) return Infinity;
+  return position / pxPerSecond;
+}
+
 /** How long the rest of the ribbon takes at the reader's current speed. */
 export function secondsToComplete(position, pxPerSecond) {
   const remaining = positionOf(TRILLION) - position;
