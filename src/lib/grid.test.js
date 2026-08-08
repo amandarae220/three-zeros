@@ -7,7 +7,10 @@ import {
   cellsFor,
   rowsFor,
   layoutFor,
-  cellOrigin
+  cellOrigin,
+  REMOVAL_MS,
+  easeOutCubic,
+  cellsRemainingAt
 } from './grid.js';
 import { TRILLION } from './scaleEngine.js';
 
@@ -125,5 +128,66 @@ describe('cellOrigin', () => {
     const last = cellOrigin(TRILLION_CELLS - 1, layout, HEIGHT);
     expect(last.y).toBe(HEIGHT - layout.cell - 24 * PITCH);
     expect(Math.floor((TRILLION_CELLS - 1) / COLUMNS)).toBe(layout.rows - 1);
+  });
+});
+
+describe('easeOutCubic', () => {
+  it('starts at zero and ends at one', () => {
+    expect(easeOutCubic(0)).toBe(0);
+    expect(easeOutCubic(1)).toBe(1);
+  });
+
+  it('front-loads the motion', () => {
+    // Most of the loss happens early — the collapse should look like a
+    // collapse, not a metronome.
+    expect(easeOutCubic(0.5)).toBeGreaterThan(0.5);
+  });
+
+  it('clamps outside the unit interval', () => {
+    expect(easeOutCubic(-1)).toBe(0);
+    expect(easeOutCubic(2)).toBe(1);
+  });
+});
+
+describe('cellsRemainingAt', () => {
+  const FROM = 1000;
+  const TO = 637;
+
+  it('holds the starting count before it begins', () => {
+    expect(cellsRemainingAt(0, FROM, TO, REMOVAL_MS)).toBe(FROM);
+  });
+
+  it('lands exactly on the ending count', () => {
+    expect(cellsRemainingAt(REMOVAL_MS, FROM, TO, REMOVAL_MS)).toBe(TO);
+  });
+
+  it('stays at the ending count afterwards', () => {
+    expect(cellsRemainingAt(REMOVAL_MS * 3, FROM, TO, REMOVAL_MS)).toBe(TO);
+  });
+
+  it('never rises part-way through', () => {
+    let previous = FROM;
+    for (let t = 0; t <= REMOVAL_MS; t += 50) {
+      const remaining = cellsRemainingAt(t, FROM, TO, REMOVAL_MS);
+      expect(remaining).toBeLessThanOrEqual(previous);
+      previous = remaining;
+    }
+  });
+
+  it('returns whole cells only', () => {
+    const remaining = cellsRemainingAt(REMOVAL_MS / 3, FROM, TO, REMOVAL_MS);
+    expect(Number.isInteger(remaining)).toBe(true);
+  });
+
+  it('stays inside the endpoints', () => {
+    for (let t = 0; t <= REMOVAL_MS; t += 137) {
+      const remaining = cellsRemainingAt(t, FROM, TO, REMOVAL_MS);
+      expect(remaining).toBeLessThanOrEqual(FROM);
+      expect(remaining).toBeGreaterThanOrEqual(TO);
+    }
+  });
+
+  it('jumps straight to the end with no duration', () => {
+    expect(cellsRemainingAt(0, FROM, TO, 0)).toBe(TO);
   });
 });

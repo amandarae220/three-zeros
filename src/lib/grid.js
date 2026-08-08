@@ -55,3 +55,22 @@ export function cellOrigin(index, layout, height) {
   const row = Math.floor(index / layout.cols);
   return { x: col * pitch, y: height - layout.cell - row * pitch };
 }
+
+/**
+ * How long the evaporation takes. Long enough to read as a quantity draining
+ * rather than a number changing, short enough that nobody waits it out.
+ */
+export const REMOVAL_MS = 4000;
+
+export function easeOutCubic(t) {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return 1 - Math.pow(1 - t, 3);
+}
+
+/** How many cells are still standing `elapsedMs` into the removal. */
+export function cellsRemainingAt(elapsedMs, fromCells, toCells, durationMs) {
+  if (durationMs <= 0) return toCells;
+  const progress = easeOutCubic(elapsedMs / durationMs);
+  return Math.round(fromCells - (fromCells - toCells) * progress);
+}
