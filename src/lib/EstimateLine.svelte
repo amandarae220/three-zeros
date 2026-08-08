@@ -232,48 +232,13 @@
 </section>
 
 <style>
+  /* Palette lives on :root in +page.svelte — one declaration serves every act. */
   .act {
-    color-scheme: light;
-    --surface-1: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --rail: #c3c2b7;
-    --hairline: rgba(11, 11, 11, 0.1);
-    --guess: #eb6834;
-    --truth: #2a78d6;
-
     max-width: 46rem;
     margin: 0 auto;
     padding: 3rem 1.25rem 4rem;
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
     color: var(--text-primary);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme='light'])) .act {
-      color-scheme: dark;
-      --surface-1: #0d0d0d;
-      --text-primary: #ffffff;
-      --text-secondary: #c3c2b7;
-      --text-muted: #898781;
-      --rail: #383835;
-      --hairline: rgba(255, 255, 255, 0.1);
-      --guess: #d95926;
-      --truth: #3987e5;
-    }
-  }
-
-  :root[data-theme='dark'] .act {
-    color-scheme: dark;
-    --surface-1: #0d0d0d;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --rail: #383835;
-    --hairline: rgba(255, 255, 255, 0.1);
-    --guess: #d95926;
-    --truth: #3987e5;
   }
 
   h2 {
