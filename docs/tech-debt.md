@@ -100,17 +100,35 @@ softens but does not remove the question.
 
 ---
 
-## Act II components have no browser verification yet
+## Act II browser verification — mostly closed
 
-**Where:** [`Ribbon.svelte`](../src/lib/Ribbon.svelte),
-[`VirtualScroll.svelte`](../src/lib/VirtualScroll.svelte)
+**Closed 2026-08-07 by Plan 2 Task 8.** 39/39 Playwright checks pass, covering
+the height ceiling, depth-independent tick count, wheel exchange rate, clamp
+release, jump targets, live-region throttling, the reduced-motion path and
+narrow-viewport overflow.
 
-The 88 unit tests cover the pure modules only. The components were verified by
-compiling them and by running their logic in Node — the tick loop's iteration
-count and the wheel clamp-release rule both check out that way.
+Two things remain unverified:
 
-Nothing browser-only has been exercised: `devicePixelRatio` scaling, the palette
-resolving through `getComputedStyle`, `ResizeObserver` firing, pointer capture,
-momentum feel, or whether the page actually releases the wheel at both ends.
+- **No real screen reader has run against this.** The checks assert ARIA
+  attributes and DOM text, which is not the same as VoiceOver or NVDA making
+  sense of it. See the `role="scrollbar"` item above.
+- **Momentum has never been felt on a touch device.** The decay factor (0.95)
+  was picked, not derived — the plan flagged it as empirical. Playwright drives
+  a mouse, so the coast has only been exercised synthetically.
 
-**To close:** Plan 2 Task 8.
+**To close:** one pass with VoiceOver, and one with a real phone.
+
+---
+
+## The verification suite lives outside the repo
+
+**Where:** `scratchpad/verify/check.mjs`, currently under a Claude Code session
+scratchpad, with its own `package.json` and a Playwright install.
+
+Every check is throwaway by location but not by value — 39 of them now encode
+claims about Acts 0 and II that no unit test covers. A new session gets a new
+scratchpad, and the file is one `rm` from gone.
+
+**To close:** decide whether it moves into the repo as `e2e/` with Playwright as
+a dev dependency, or stays deliberately outside it. If it stays out, copy it
+somewhere durable.

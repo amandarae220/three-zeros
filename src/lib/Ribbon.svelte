@@ -75,6 +75,7 @@
 
     const end = position + height;
     let tick = firstTickAtOrAfter(position, MINOR_TICK_PX);
+    let drawn = 0;
 
     while (tick <= end) {
       const y = tick - position;
@@ -85,11 +86,16 @@
 
       if (major) {
         ctx.fillStyle = colorLabel;
-        ctx.fillText(tickLabel(tick), LABEL_X, y + 4);
+        // Clamped so a label landing on the top edge is not sliced in half.
+        ctx.fillText(tickLabel(tick), LABEL_X, Math.max(y + 4, 11));
       }
 
       tick += MINOR_TICK_PX;
+      drawn++;
     }
+
+    // Dev only: lets browser verification prove the loop is depth-independent.
+    if (import.meta.env.DEV) window.__ribbonTicks = drawn;
   }
 
   /** Many input events, at most one draw per frame. */

@@ -137,7 +137,7 @@
   });
 </script>
 
-<section class="act" aria-labelledby="act-two-heading">
+<section class="act act-two" aria-labelledby="act-two-heading">
   <header>
     <h2 id="act-two-heading">Act II — The Scroll</h2>
     <p class="prompt">
@@ -149,7 +149,7 @@
   {#if reducedMotion}
     <div class="static">
       <p>
-        The ribbon below is normally scrolled. At a determined {PIXELS.format(
+        This act is normally a scroll, at one hundred dollars per pixel. At a determined {PIXELS.format(
           BRISK_PX_PER_SECOND
         )} pixels per second, here is what each amount costs to reach.
       </p>
@@ -177,13 +177,13 @@
       <p class="futility">You are not expected to finish this.</p>
 
       <p>
-        Every recognisable sum sits inside the first {PIXELS.format(
+        Every recognizable sum sits inside the first {PIXELS.format(
           ladder[ladder.length - 1].position
         )} pixels — {formatFraction(ladder[ladder.length - 1].position / MAX)} of the distance.
       </p>
 
       <table>
-        <caption class="sr-only">The ladder of recognisable sums</caption>
+        <caption class="sr-only">The ladder of recognizable sums</caption>
         <thead>
           <tr>
             <th scope="col">Sum</th>
@@ -207,6 +207,10 @@
           {/each}
         </tbody>
       </table>
+
+      <p class="onward">
+        <a class="skip" href="#act-three">Skip to Act III</a>
+      </p>
     </div>
   {:else}
   <div class="stage" bind:clientHeight={height}>
@@ -243,6 +247,12 @@
     {/if}
   </div>
 
+    <!-- Before the jump buttons deliberately: leaving must never cost more
+         than two Tab presses from the top of the act. -->
+    <p class="onward">
+      <a class="skip" href="#act-three">Skip to Act III</a>
+    </p>
+
     <div class="controls">
       <p class="controls-label" id="jump-label">Jump ahead</p>
       <ul class="jumps" aria-labelledby="jump-label">
@@ -267,10 +277,6 @@
       {/each}
     </ol>
   {/if}
-
-  <p class="onward">
-    <a class="skip" href="#act-three">Skip to Act III</a>
-  </p>
 </section>
 
 <style>
@@ -370,6 +376,10 @@
     top: 1rem;
     max-width: 20rem;
     margin: 0;
+    /* Opaque: the canvas draws its tick labels underneath this. */
+    padding: 0.625rem 0.75rem;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
     font-size: 0.875rem;
     line-height: 1.45;
     color: var(--text-secondary);
