@@ -61,7 +61,26 @@
 
   const current = $derived(STEPS[step]);
 
+  /**
+   * A sticky stage that swaps its contents as the reader scrolls is motion
+   * this query exists to suppress. The static path makes the same argument as
+   * a table: what a square is worth, what a screen is worth, and the arc.
+   */
+  let reducedMotion = $state(false);
+
   $effect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = query.matches;
+
+    const onChange = (event) => (reducedMotion = event.matches);
+    query.addEventListener('change', onChange);
+
+    return () => query.removeEventListener('change', onChange);
+  });
+
+  $effect(() => {
+    if (reducedMotion) return;
+
     const elements = markers.filter(Boolean);
     if (elements.length === 0) return;
 
@@ -83,10 +102,104 @@
   <header>
     <h2 id="act-three-heading">Act III — Zoom Out</h2>
     <p class="prompt">
-      The only place in this piece where a trillion fits on one screen. Keep scrolling.
+      The only place in this piece where a trillion fits on one screen.
+      {#if !reducedMotion}Keep scrolling.{/if}
     </p>
   </header>
 
+  {#if reducedMotion}
+    <div class="static">
+      <p>
+        This act is normally a grid that redraws as you scroll. Each step, as a figure:
+      </p>
+
+      <table>
+        <caption class="sr-only">What each square and each screen is worth</caption>
+        <thead>
+          <tr>
+            <th scope="col">Unit</th>
+            <th scope="col">Made of</th>
+            <th scope="col">Worth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">One square</th>
+            <td>—</td>
+            <td>{formatDollars(SQUARE_DOLLARS)}</td>
+          </tr>
+          <tr>
+            <th scope="row">One screen</th>
+            <td>{TRILLION_CELLS.toLocaleString('en-US')} squares</td>
+            <td>{formatDollars(CELL_DOLLARS)}</td>
+          </tr>
+          <tr>
+            <th scope="row">A trillion</th>
+            <td>{TRILLION_CELLS.toLocaleString('en-US')} screens</td>
+            <td>{formatDollars(TRILLION)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        Relabelling is the whole act. The same thousand squares are a billion dollars when each
+        one is {formatDollars(SQUARE_DOLLARS)}, and a trillion when each one is
+        {formatDollars(CELL_DOLLARS)}. Nothing about the grid changes.
+      </p>
+
+      <p>
+        Act II charged you about {billionCrossing} to cross a single billion at a determined
+        scroll. This act fits a thousand of them on one screen.
+      </p>
+
+      <table>
+        <caption class="sr-only">The arc, as squares against the trillion line</caption>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Figure</th>
+            <th scope="col">Squares</th>
+            <th scope="col">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{peak.date}</th>
+            <td>{formatDollars(peak.dollars)}</td>
+            <td>
+              {peakCells.toLocaleString('en-US')} — {peakCells - TRILLION_CELLS} above the line
+            </td>
+            <td>
+              <a href={peak.source} rel="noreferrer">Source</a>
+              <span class="as-of">as of {peak.asOf}</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">{closing.date}</th>
+            <td>{formatDollars(closing.dollars)}</td>
+            <td>{closingCells} — below the line</td>
+            <td>
+              <a href={closing.source} rel="noreferrer">Source</a>
+              <span class="as-of">as of {closing.asOf}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        The difference is {peakCells - closingCells} squares — {formatShort(
+          peak.dollars - closing.dollars
+        )}, in seven weeks.
+      </p>
+
+      {#if peak.conflict}
+        <p class="conflict">
+          {peak.conflict.note}
+          <a href={peak.conflict.source} rel="noreferrer">Other figure</a>
+        </p>
+      {/if}
+    </div>
+  {:else}
   <div class="scrolly">
     <div class="stage">
       <ZoomGrid
@@ -163,6 +276,7 @@
       </div>
     </div>
   </div>
+  {/if}
 </section>
 
 <style>
@@ -259,5 +373,67 @@
   .conflict {
     font-size: 0.8125rem !important;
     color: var(--text-muted) !important;
+  }
+
+  .static p {
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem;
+  }
+
+  .static .conflict {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 2rem;
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.6rem 0.75rem 0.6rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  thead th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  tbody th {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  tbody td {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+  }
+
+  .as-of {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 </style>

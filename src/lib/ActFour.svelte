@@ -71,8 +71,25 @@
     frame = requestAnimationFrame(tick);
   }
 
+  /**
+   * A quantity draining in front of the reader is exactly the motion this
+   * query suppresses. The static path states the same subtraction in prose —
+   * the end state, not a degraded animation.
+   */
+  let reducedMotion = $state(false);
+
   $effect(() => {
-    if (!stage) return;
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = query.matches;
+
+    const onChange = (event) => (reducedMotion = event.matches);
+    query.addEventListener('change', onChange);
+
+    return () => query.removeEventListener('change', onChange);
+  });
+
+  $effect(() => {
+    if (reducedMotion || !stage) return;
 
     // Runs once. Re-entering the act does not replay the loss.
     const observer = new IntersectionObserver(
@@ -106,6 +123,29 @@
     </p>
   </header>
 
+  {#if reducedMotion}
+    <div class="static">
+      <p class="lede-static">{lostCells} squares, gone in thirty-one days.</p>
+      <p>
+        On {preJuly.date} he was above the line again at {fromCells} squares. July removed
+        {lostCells} of them. Every one is a billion dollars — the distance Act II charged you
+        the better part of an hour to cross once. This is that distance, {lostCells} times
+        over, leaving in a month.
+      </p>
+      {#if guessedDollars !== null}
+        <p class="callback-static">
+          {#if guessedDollars < julyLoss.dollars}
+            In Act 0 you put a billion at {formatShort(guessedDollars)}. What left in July is
+            {lossVersusGuess}× that.
+          {:else}
+            In Act 0 you put a billion at {formatShort(guessedDollars)} — more than the
+            {formatShort(julyLoss.dollars)} that vanished in July. Your guess at a single
+            billion was larger than an entire month's collapse.
+          {/if}
+        </p>
+      {/if}
+    </div>
+  {:else}
   <div class="stage" bind:this={stage}>
     <ZoomGrid
       count={remaining}
@@ -143,6 +183,7 @@
       </div>
     {/if}
   </div>
+  {/if}
 
   <p class="sr-only" role="status" aria-live="polite">{announcement}</p>
 
@@ -264,6 +305,22 @@
   }
 
   .callback {
+    color: var(--guess) !important;
+  }
+
+  .static p {
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem;
+  }
+
+  .lede-static {
+    font-size: 1.0625rem;
+    color: var(--text-primary) !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .callback-static {
     color: var(--guess) !important;
   }
 
