@@ -80,6 +80,9 @@
       ctx.fillRect(x, y, layout.cell, layout.cell);
     }
 
+    // Dev only: lets browser verification read what was actually drawn.
+    if (import.meta.env.DEV) window.__zoomCells = count;
+
     if (threshold > 0 && threshold <= capacity) {
       const pitch = layout.cell + layout.gap;
       const y = height - (threshold / layout.cols) * pitch + layout.gap / 2;
@@ -89,8 +92,12 @@
 
       if (label) {
         ctx.fillStyle = colorLabel;
+        // Right-aligned: the acts put their captions over the left of the grid,
+        // and a label drawn at x=0 disappears underneath them.
+        ctx.textAlign = 'right';
         // Clamped so a rule near the top edge does not slice its own label.
-        ctx.fillText(label, 0, Math.max(y - 8, 11));
+        ctx.fillText(label, width, Math.max(y - 8, 11));
+        ctx.textAlign = 'left';
       }
     }
   }

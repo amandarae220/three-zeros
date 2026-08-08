@@ -1,6 +1,7 @@
 <script>
   import EstimateLine from '$lib/EstimateLine.svelte';
   import ActTwo from '$lib/ActTwo.svelte';
+  import ActThree from '$lib/ActThree.svelte';
 
   // Held at page level — Act IV calls back to it.
   let readerGuess = $state(null);
@@ -17,10 +18,7 @@
 <main>
   <EstimateLine onCommit={(g) => (readerGuess = g)} />
   <ActTwo />
-  <!-- Where Act III mounts. Present now so Act II's escape hatch has a real
-       target — the reader must be able to leave before the act it leaves to
-       is built. -->
-  <div id="act-three" tabindex="-1"></div>
+  <ActThree />
 </main>
 
 <style>
