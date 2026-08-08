@@ -2,6 +2,7 @@
   import EstimateLine from '$lib/EstimateLine.svelte';
   import ActTwo from '$lib/ActTwo.svelte';
   import ActThree from '$lib/ActThree.svelte';
+  import ActFour from '$lib/ActFour.svelte';
 
   // Held at page level — Act IV calls back to it.
   let readerGuess = $state(null);
@@ -19,6 +20,7 @@
   <EstimateLine onCommit={(g) => (readerGuess = g)} />
   <ActTwo />
   <ActThree />
+  <ActFour {readerGuess} />
 </main>
 
 <style>
