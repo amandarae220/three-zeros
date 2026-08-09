@@ -152,6 +152,7 @@
       capacity={peakCells}
       threshold={TRILLION_CELLS}
       label={formatShort(TRILLION)}
+      debugName="four"
     />
 
     <div class="readout">

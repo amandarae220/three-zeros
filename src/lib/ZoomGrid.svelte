@@ -10,7 +10,10 @@
     capacity = 0,
     /** Cell index the rule is drawn at. 0 draws no rule. */
     threshold = 0,
-    label = ''
+    label = '',
+    /** Namespaces this grid's dev-only debug readout. Both acts mount a grid;
+     *  a shared key would report whichever drew last. */
+    debugName = 'grid'
   } = $props();
 
   let container = $state(null);
@@ -80,9 +83,6 @@
       ctx.fillRect(x, y, layout.cell, layout.cell);
     }
 
-    // Dev only: lets browser verification read what was actually drawn.
-    if (import.meta.env.DEV) window.__zoomCells = count;
-
     if (threshold > 0 && threshold <= capacity) {
       const pitch = layout.cell + layout.gap;
       const y = height - (threshold / layout.cols) * pitch + layout.gap / 2;
@@ -99,8 +99,32 @@
         ctx.fillText(label, width, Math.max(y - 8, 11));
         ctx.textAlign = 'left';
       }
+
+      if (import.meta.env.DEV) ruleY = y;
+    } else if (import.meta.env.DEV) {
+      ruleY = null;
+    }
+
+    // Dev only: lets browser verification read what was actually drawn rather
+    // than inferring it from pixels.
+    if (import.meta.env.DEV) {
+      window.__zoomDebug = {
+        ...window.__zoomDebug,
+        [debugName]: {
+          count,
+          capacity,
+          threshold,
+          rows: layout.rows,
+          cell: layout.cell,
+          gap: layout.gap,
+          height,
+          ruleY
+        }
+      };
     }
   }
+
+  let ruleY = null;
 
   function schedule() {
     if (frame === null) frame = requestAnimationFrame(draw);
@@ -148,5 +172,9 @@
 
   canvas {
     display: block;
+    /* The backing store carries an explicit pixel width. Without this the
+       canvas becomes its container's auto min-width and the layout can never
+       shrink — which is what broke reflow at 200% zoom. */
+    max-width: 100%;
   }
 </style>

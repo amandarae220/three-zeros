@@ -120,6 +120,20 @@ Two things remain unverified:
 
 ---
 
+## Act III's step thresholds and Act IV's timing are unfelt
+
+**Where:** [`ActThree.svelte`](../src/lib/ActThree.svelte) `rootMargin`,
+[`grid.js`](../src/lib/grid.js) `REMOVAL_MS`
+
+`rootMargin: '-50% 0px -50% 0px'` fires each step at the viewport midpoint, and
+`REMOVAL_MS = 4000` is how long July takes to drain. Both were picked, not
+derived, and both have only ever been exercised by Playwright driving synthetic
+scrolls. Neither has been judged on a real trackpad.
+
+**To close:** scroll Act III by hand and watch Act IV once, then adjust.
+
+---
+
 ## The verification suite lives outside the repo
 
 **Where:** `scratchpad/verify/check.mjs`, currently under a Claude Code session

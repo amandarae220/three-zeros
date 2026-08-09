@@ -98,7 +98,13 @@
   });
 </script>
 
-<section id="act-three" class="act act-three" aria-labelledby="act-three-heading">
+<!-- tabindex="-1" so Act II's skip link moves focus here, not just the viewport. -->
+<section
+  id="act-three"
+  class="act act-three"
+  tabindex="-1"
+  aria-labelledby="act-three-heading"
+>
   <header>
     <h2 id="act-three-heading">Act III — Zoom Out</h2>
     <p class="prompt">
@@ -207,6 +213,7 @@
         capacity={current.capacity}
         threshold={current.threshold}
         label={current.label}
+        debugName="three"
       />
     </div>
 
@@ -311,6 +318,8 @@
   .stage,
   .steps {
     grid-area: 1 / 1;
+    /* Grid items default to an auto minimum the canvas would otherwise set. */
+    min-width: 0;
   }
 
   .stage {
