@@ -120,6 +120,22 @@ Two things remain unverified:
 
 ---
 
+## Contrast is verified by sampling, not by eye
+
+**Where:** the palette in [`+page.svelte`](../src/routes/+page.svelte)
+
+The audit samples every text node's computed colour against its nearest painted
+background and calculates the ratio — 161 nodes, both themes, all passing AA.
+Two things that method cannot see: text drawn *on* the canvas (Act II's tick
+labels, Act III's threshold label), which is painted pixels rather than a DOM
+node, and whether the darker light-mode tones still read as a deliberate
+hierarchy rather than as three greys that drifted together.
+
+**To close:** look at the page in both themes, and check the canvas labels
+against their backdrop by hand.
+
+---
+
 ## Act III's step thresholds and Act IV's timing are unfelt
 
 **Where:** [`ActThree.svelte`](../src/lib/ActThree.svelte) `rootMargin`,

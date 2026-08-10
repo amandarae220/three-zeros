@@ -51,11 +51,14 @@
     --surface-1: #f9f9f7;
     --text-primary: #0b0b0b;
     --text-secondary: #52514e;
-    --text-muted: #898781;
+    /* Muted and link tones are darker here than the dark-mode pair below.
+       At #898781 and #2a78d6 they measured 3.41:1 and 4.19:1 on this surface —
+       both under AA for the 12–14px sizes they are actually used at. */
+    --text-muted: #6f6e69;
     --rail: #c3c2b7;
     --hairline: rgba(11, 11, 11, 0.1);
     --guess: #eb6834;
-    --truth: #2a78d6;
+    --truth: #1a66c2;
   }
 
   @media (prefers-color-scheme: dark) {
