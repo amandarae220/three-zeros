@@ -5,9 +5,13 @@
   import ActThree from '$lib/ActThree.svelte';
   import ActFour from '$lib/ActFour.svelte';
   import Coda from '$lib/Coda.svelte';
+  import { timeline } from '$lib/../data/timeline.js';
 
   // Held at page level — Act IV calls back to it.
   let readerGuess = $state(null);
+
+  /** The piece is dated at its last reading. Stated here and again in the coda. */
+  const asOf = timeline[timeline.length - 1].asOf;
 </script>
 
 <svelte:head>
@@ -19,6 +23,19 @@
 </svelte:head>
 
 <main>
+  <!-- The document's only h1. Every act opens at h2 beneath it, and the coda's
+       parts at h3, so the outline has a top and no gaps. -->
+  <header class="masthead">
+    <h1>Three Zeros</h1>
+    <p class="standfirst">
+      A million, a billion, a trillion. We read them as a count — first, second, third. Each
+      one is a thousand of the last, and nobody can picture the gap.
+    </p>
+    <p class="dateline">
+      The first trillionaire, and the fact that he isn't one anymore. Figures as of {asOf}.
+    </p>
+  </header>
+
   <EstimateLine onCommit={(g) => (readerGuess = g)} />
   <ActOne />
   <ActTwo />
@@ -70,5 +87,35 @@
   :global(body) {
     margin: 0;
     background: var(--surface-1);
+  }
+
+  .masthead {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 5rem 1.25rem 1rem;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--text-primary);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    margin: 0 0 1rem;
+  }
+
+  .standfirst {
+    max-width: 34rem;
+    margin: 0 0 1rem;
+    font-size: clamp(1.0625rem, 2.5vw, 1.25rem);
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .dateline {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-muted);
   }
 </style>
