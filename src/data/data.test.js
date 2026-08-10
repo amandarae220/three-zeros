@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { timeline, julyLoss } from './timeline.js';
 import { referents } from './referents.js';
+import { durations } from './durations.js';
 
 const records = [...timeline, ...referents, julyLoss];
 
@@ -73,6 +74,35 @@ describe('referents', () => {
   it('fits the whole ladder inside the first thousandth of the ribbon', () => {
     const largest = Math.max(...referents.map((r) => r.dollars));
     expect(largest / 1_320_000_000_000).toBeLessThan(0.001);
+  });
+});
+
+describe('durations', () => {
+  it('covers a million, a billion, and a trillion seconds', () => {
+    expect(durations.map((d) => d.seconds)).toEqual([1e6, 1e9, 1e12]);
+  });
+
+  it('gives every entry a label and an anchor', () => {
+    for (const d of durations) {
+      expect(d.label, JSON.stringify(d)).toBeTruthy();
+      expect(d.anchor, JSON.stringify(d)).toBeTruthy();
+    }
+  });
+
+  it('sources every anchor that claims something about the world', () => {
+    // An anchor that is pure arithmetic needs no citation. One that asserts a
+    // fact — when farming began, how long a life runs — does.
+    for (const d of durations.filter((entry) => entry.claim)) {
+      expect(d.source, JSON.stringify(d)).toMatch(/^https?:\/\//);
+      expect(d.asOf, JSON.stringify(d)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+    expect(durations.filter((d) => d.claim).length).toBeGreaterThan(0);
+  });
+
+  it('carries no dollar figures — this act is about time', () => {
+    for (const d of durations) {
+      expect(d.dollars).toBeUndefined();
+    }
   });
 });
 
