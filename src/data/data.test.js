@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { timeline, julyLoss } from './timeline.js';
 import { referents } from './referents.js';
 import { durations } from './durations.js';
+import { elementHeightLimits, LOWEST_CEILING } from './limits.js';
+import { TRILLION, positionOf } from '../lib/scaleEngine.js';
 
 const records = [...timeline, ...referents, julyLoss];
 
@@ -103,6 +105,25 @@ describe('durations', () => {
     for (const d of durations) {
       expect(d.dollars).toBeUndefined();
     }
+  });
+});
+
+describe('elementHeightLimits', () => {
+  it('sources and dates every measured limit', () => {
+    for (const limit of elementHeightLimits) {
+      expect(limit.source, JSON.stringify(limit)).toMatch(/^https?:\/\//);
+      expect(limit.asOf, JSON.stringify(limit)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(limit.pixels).toBeGreaterThan(0);
+    }
+  });
+
+  it('takes the lowest ceiling as the one to clear', () => {
+    expect(LOWEST_CEILING).toBe(Math.min(...elementHeightLimits.map((l) => l.pixels)));
+  });
+
+  it('is overrun by the ribbon, which is the reason Act II exists', () => {
+    expect(positionOf(TRILLION)).toBeGreaterThan(LOWEST_CEILING);
+    expect(Math.round(positionOf(TRILLION) / LOWEST_CEILING)).toBe(298);
   });
 });
 

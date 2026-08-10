@@ -1,7 +1,14 @@
 <script>
   import { referents } from '../data/referents.js';
   import { timeline, julyLoss } from '../data/timeline.js';
-  import { formatDollars } from './scaleEngine.js';
+  import { elementHeightLimits, LOWEST_CEILING } from '../data/limits.js';
+  import { DOLLARS_PER_PIXEL, TRILLION, positionOf, formatDollars } from './scaleEngine.js';
+
+  const PIXELS = new Intl.NumberFormat('en-US');
+
+  const ribbonPixels = positionOf(TRILLION);
+  /** Computed, not asserted. No adjective does work a number can do. */
+  const overrun = Math.round(ribbonPixels / LOWEST_CEILING);
 
   /** The piece is dated at its last reading and does not follow the subject further. */
   const asOf = timeline[timeline.length - 1].asOf;
@@ -113,6 +120,54 @@
       {/each}
     </tbody>
   </table>
+  </div>
+
+  <h3 id="coda-build">How it is built</h3>
+  <div class="note-body" aria-labelledby="coda-build">
+    <p>
+      A browser will not let an element grow past a certain height. No standard sets the
+      figure; it is a limit each engine imposes, and the virtual-scrolling libraries that keep
+      hitting it have measured it:
+    </p>
+
+    <ul class="limits">
+      {#each elementHeightLimits as limit (limit.browser)}
+        <li>
+          <strong>{limit.browser}</strong>
+          {PIXELS.format(limit.pixels)}px
+          <a
+            href={limit.source}
+            rel="noreferrer"
+            aria-label="Source for the measured {limit.browser} element height limit"
+          >
+            Source
+          </a>
+        </li>
+      {/each}
+    </ul>
+
+    <p>
+      Act II runs at {formatDollars(DOLLARS_PER_PIXEL)} per pixel, which is honest and which
+      makes a trillion dollars {PIXELS.format(ribbonPixels)} pixels tall. That overruns the
+      lowest of those ceilings by {overrun} times. There is no rate that fixes this: any rate
+      slow enough to be truthful puts the end of the ribbon past what an element can be.
+    </p>
+
+    <p>
+      So the scrollbar had to go. The app owns a single position value, and the canvas draws
+      only the slice of ribbon currently on screen — about twenty ticks, the same number at
+      nine billion pixels in as at zero. No element is ever tall; nothing is laid out that
+      cannot be seen. Cost is a function of the viewport, not of the distance travelled.
+    </p>
+
+    <p>
+      Owning the scroll means owning everything the scrollbar was doing for the reader. The
+      wheel is released at both ends, so the page is never trapped. Every jump target is a
+      real button in the tab order, and the skip link sits ahead of them, so leaving costs at
+      most two Tab presses. The canvas is decoration marked <code>aria-hidden</code>, with the
+      figures in the DOM beside it. A reader who asks for reduced motion gets no canvas at
+      all — the same argument as prose and tables, not a degraded version of it.
+    </p>
   </div>
 </section>
 
@@ -233,6 +288,43 @@
   a:focus-visible {
     outline: 2px solid var(--truth);
     outline-offset: 2px;
+  }
+
+  .note-body p {
+    margin: 0 0 1.125rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .limits {
+    margin: 0 0 1.125rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .limits li {
+    padding: 0.4rem 0;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .limits strong {
+    display: inline-block;
+    min-width: 5rem;
+    color: var(--text-primary);
+  }
+
+  .limits a {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    color: var(--text-primary);
   }
 
   .sr-only {
