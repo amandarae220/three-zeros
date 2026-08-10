@@ -1,5 +1,6 @@
 <script>
   import EstimateLine from '$lib/EstimateLine.svelte';
+  import ActOne from '$lib/ActOne.svelte';
   import ActTwo from '$lib/ActTwo.svelte';
   import ActThree from '$lib/ActThree.svelte';
   import ActFour from '$lib/ActFour.svelte';
@@ -18,6 +19,7 @@
 
 <main>
   <EstimateLine onCommit={(g) => (readerGuess = g)} />
+  <ActOne />
   <ActTwo />
   <ActThree />
   <ActFour {readerGuess} />

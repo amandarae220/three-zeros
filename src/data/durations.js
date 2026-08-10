@@ -15,8 +15,7 @@ export const durations = [
   {
     seconds: 1e6,
     label: 'A million seconds',
-    anchor:
-      'A week and a half. It has passed since roughly the last time you read the word "million" without stopping.'
+    anchor: 'A week and a half. Long enough to notice, short enough to remember.'
   },
   {
     seconds: 1e9,
@@ -31,7 +30,7 @@ export const durations = [
     label: 'A trillion seconds',
     anchor: 'Before farming. Before writing. Before anything you would recognize as a society.',
     claim:
-      'Agriculture took root about 12,000 years ago. A trillion seconds is more than twice as long again.',
+      'Agriculture took root about 12,000 years ago. A trillion seconds is more than twice that.',
     source: 'https://education.nationalgeographic.org/resource/development-agriculture/',
     asOf: '2022-10-19'
   }
