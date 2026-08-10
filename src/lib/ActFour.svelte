@@ -195,7 +195,11 @@
         <dt>{preJuly.date}</dt>
         <dd>
           {formatDollars(preJuly.dollars)}
-          <a href={preJuly.source} rel="noreferrer">Source · as of {preJuly.asOf}</a>
+          <a
+            href={preJuly.source}
+            rel="noreferrer"
+            aria-label="Source for the {preJuly.date} figure, as of {preJuly.asOf}"
+          >Source · as of {preJuly.asOf}</a>
         </dd>
       </div>
       <div>
@@ -203,14 +207,22 @@
         <dd>
           −{formatDollars(julyLoss.dollars)}
           <span class="note">{julyLoss.note}</span>
-          <a href={julyLoss.source} rel="noreferrer">Source · as of {julyLoss.asOf}</a>
+          <a
+            href={julyLoss.source}
+            rel="noreferrer"
+            aria-label="Source for {julyLoss.label}, as of {julyLoss.asOf}"
+          >Source · as of {julyLoss.asOf}</a>
         </dd>
       </div>
       <div>
         <dt>{closing.date}</dt>
         <dd>
           {formatDollars(closing.dollars)}
-          <a href={closing.source} rel="noreferrer">Source · as of {closing.asOf}</a>
+          <a
+            href={closing.source}
+            rel="noreferrer"
+            aria-label="Source for the {closing.date} figure, as of {closing.asOf}"
+          >Source · as of {closing.asOf}</a>
         </dd>
       </div>
     </dl>

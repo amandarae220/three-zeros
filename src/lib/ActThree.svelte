@@ -176,7 +176,11 @@
               {peakCells.toLocaleString('en-US')} — {peakCells - TRILLION_CELLS} above the line
             </td>
             <td>
-              <a href={peak.source} rel="noreferrer">Source</a>
+              <a
+                href={peak.source}
+                rel="noreferrer"
+                aria-label="Source for the {peak.date} peak figure, as of {peak.asOf}"
+              >Source</a>
               <span class="as-of">as of {peak.asOf}</span>
             </td>
           </tr>
@@ -185,7 +189,11 @@
             <td>{formatDollars(closing.dollars)}</td>
             <td>{closingCells} — below the line</td>
             <td>
-              <a href={closing.source} rel="noreferrer">Source</a>
+              <a
+                href={closing.source}
+                rel="noreferrer"
+                aria-label="Source for the {closing.date} figure, as of {closing.asOf}"
+              >Source</a>
               <span class="as-of">as of {closing.asOf}</span>
             </td>
           </tr>
@@ -201,7 +209,13 @@
       {#if peak.conflict}
         <p class="conflict">
           {peak.conflict.note}
-          <a href={peak.conflict.source} rel="noreferrer">Other figure</a>
+          <a
+            href={peak.conflict.source}
+            rel="noreferrer"
+            aria-label="Competing source for the {peak.date} peak, reporting {formatShort(
+              peak.conflict.figure
+            )}"
+          >Competing figure: {formatShort(peak.conflict.figure)}</a>
         </p>
       {/if}
     </div>
@@ -256,12 +270,22 @@
           </p>
           <p class="figure">
             {formatDollars(peak.dollars)}
-            <a href={peak.source} rel="noreferrer">Source · as of {peak.asOf}</a>
+            <a
+              href={peak.source}
+              rel="noreferrer"
+              aria-label="Source for the {peak.date} peak figure, as of {peak.asOf}"
+            >Source · as of {peak.asOf}</a>
           </p>
           {#if peak.conflict}
             <p class="conflict">
               {peak.conflict.note}
-              <a href={peak.conflict.source} rel="noreferrer">Other figure</a>
+              <a
+            href={peak.conflict.source}
+            rel="noreferrer"
+            aria-label="Competing source for the {peak.date} peak, reporting {formatShort(
+              peak.conflict.figure
+            )}"
+          >Competing figure: {formatShort(peak.conflict.figure)}</a>
             </p>
           {/if}
         </div>
@@ -276,7 +300,11 @@
           </p>
           <p class="figure">
             {formatDollars(closing.dollars)}
-            <a href={closing.source} rel="noreferrer">Source · as of {closing.asOf}</a>
+            <a
+              href={closing.source}
+              rel="noreferrer"
+              aria-label="Source for the {closing.date} figure, as of {closing.asOf}"
+            >Source · as of {closing.asOf}</a>
           </p>
           <p>That gap is the first thing in this piece you can see all at once.</p>
         </div>

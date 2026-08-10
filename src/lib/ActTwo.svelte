@@ -200,7 +200,11 @@
               </th>
               <td>{formatDollars(referent.dollars)}</td>
               <td>
-                <a href={referent.source} rel="noreferrer">Source</a>
+                <a
+                  href={referent.source}
+                  rel="noreferrer"
+                  aria-label="Source for {referent.label}, as of {referent.asOf}"
+                >Source</a>
                 <span class="as-of">as of {referent.asOf}</span>
               </td>
             </tr>
@@ -236,7 +240,12 @@
         <p class="card-label">{current.label}</p>
         <p class="card-amount">{formatDollars(current.dollars)}</p>
         <p class="card-note">{current.note}</p>
-        <a class="card-source" href={current.source} rel="noreferrer">Source · as of {current.asOf}</a>
+        <a
+          class="card-source"
+          href={current.source}
+          rel="noreferrer"
+          aria-label="Source for {current.label}, as of {current.asOf}"
+        >Source · as of {current.asOf}</a>
       </aside>
     {/if}
 
@@ -272,7 +281,11 @@
       {#each ladder as referent (referent.dollars)}
         <li>
           {referent.label}: {formatDollars(referent.dollars)}. {referent.note}
-          <a href={referent.source} rel="noreferrer">Source, as of {referent.asOf}</a>
+          <a
+            href={referent.source}
+            rel="noreferrer"
+            aria-label="Source for {referent.label}, as of {referent.asOf}"
+          >Source, as of {referent.asOf}</a>
         </li>
       {/each}
     </ol>
