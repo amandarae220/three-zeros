@@ -4,6 +4,7 @@
   import ActTwo from '$lib/ActTwo.svelte';
   import ActThree from '$lib/ActThree.svelte';
   import ActFour from '$lib/ActFour.svelte';
+  import Coda from '$lib/Coda.svelte';
 
   // Held at page level — Act IV calls back to it.
   let readerGuess = $state(null);
@@ -23,6 +24,7 @@
   <ActTwo />
   <ActThree />
   <ActFour {readerGuess} />
+  <Coda />
 </main>
 
 <style>
